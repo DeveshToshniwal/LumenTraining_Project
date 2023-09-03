@@ -94,7 +94,7 @@ public class FoodServiceImpl implements FoodItemService{
             return readData(process, dataFile.getFilename());
 
         } catch (FileNotFoundException e) {
-            throw new DataNotFoundException("Enter a food item from the available options", e);
+            throw new DataNotFoundException("Description not found for item "+itemName, e);
         } catch (Exception e) {
             throw new InternalServerException("Internal Processing Error has occured");
         }
@@ -115,11 +115,7 @@ public class FoodServiceImpl implements FoodItemService{
             if(content.toString().length() > 1) {
                 return content.toString();
             }
-            List<String> names = repository.findFoodItemNames();
-            names = names.stream().map(x->x.replaceAll(" ","").toLowerCase()).collect(Collectors.toList());
-            if(names.contains(name.replaceAll(" ","").toLowerCase()))
-                return "Sorry Description is not available for this Food Item.";
-            return "No Data Available";
+            return "Data Unavailable";
         }
     }
 
