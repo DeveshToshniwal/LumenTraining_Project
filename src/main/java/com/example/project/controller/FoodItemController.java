@@ -77,18 +77,9 @@ public class FoodItemController {
     @GetMapping("/description")
     public ResponseEntity<String> getFoodItemDescription(@RequestParam("itemName") String itemName) {
         String description = service.getFoodItemDescription(itemName);
+        if(description.equals("Data Unavailable"))
+            return ResponseEntity.badRequest().body(description);
         return ResponseEntity.ok(description);
-    }
-
-    public final StandardResponse createFailureResponse(String _msg) {
-        return createFailureResponse("500", _msg);
-    }
-
-
-    public final StandardResponse createFailureResponse(String _statusCode, String _msg) {
-        StandardResponse stdResponse = new StandardResponse();
-        stdResponse.initFailure(_statusCode, _msg);
-        return stdResponse;
     }
 
 

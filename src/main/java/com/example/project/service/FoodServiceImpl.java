@@ -5,6 +5,8 @@ import com.example.project.exceptions.DuplicateDataException;
 import com.example.project.exceptions.InternalServerException;
 import com.example.project.model.FoodItem;
 import com.example.project.repository.FoodItemRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
@@ -13,10 +15,11 @@ import org.springframework.util.StringUtils;
 
 import java.io.*;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class FoodServiceImpl implements FoodItemService{
+
+    private static final Logger log = LoggerFactory.getLogger(FoodServiceImpl.class);
 
     @Autowired
     private FoodItemRepository repository;
@@ -28,12 +31,15 @@ public class FoodServiceImpl implements FoodItemService{
 
     @Override
     public FoodItem getItemByName(String foodName) {
-        System.out.println("foodName ------> "+foodName);
+        log.debug("Searching for the item name {}",foodName);
         FoodItem item = repository.findFoodItemByName(foodName);
         if(item!=null)
             return item;
         else
+        {
+            log.debug("No food item with name {} found.",foodName);
             throw new DataNotFoundException("No food item with name : "+foodName+" found.");
+        }
     }
 
     @Override
@@ -42,7 +48,10 @@ public class FoodServiceImpl implements FoodItemService{
         if(item == null)
             repository.save(foodItem);
         else
+        {
+            log.debug("Saving to database failed as food item with name {} already exists",foodItem.getName());
             throw new DuplicateDataException("Food Item with name "+foodItem.getName()+" already exists");
+        }
     }
 
     @Override
@@ -57,7 +66,10 @@ public class FoodServiceImpl implements FoodItemService{
             return item;
         }
         else
+        {
+            log.debug("Updating failed as item with name {} could not be found",foodItem.getName());
             throw new DataNotFoundException("No food item with name : "+foodItem.getName()+" found.");
+        }
     }
 
     @Override
@@ -94,7 +106,7 @@ public class FoodServiceImpl implements FoodItemService{
             return readData(process, dataFile.getFilename());
 
         } catch (FileNotFoundException e) {
-            throw new DataNotFoundException("Enter a food item from the available options", e);
+            throw new DataNotFoundException("Description not found for item "+itemName, e);
         } catch (Exception e) {
             throw new InternalServerException("Internal Processing Error has occured");
         }
@@ -115,11 +127,7 @@ public class FoodServiceImpl implements FoodItemService{
             if(content.toString().length() > 1) {
                 return content.toString();
             }
-            List<String> names = repository.findFoodItemNames();
-            names = names.stream().map(x->x.replaceAll(" ","").toLowerCase()).collect(Collectors.toList());
-            if(names.contains(name.replaceAll(" ","").toLowerCase()))
-                return "Sorry Description is not available for this Food Item.";
-            return "No Data Available";
+            return "Data Unavailable";
         }
     }
 
