@@ -82,17 +82,6 @@ public class FoodItemController {
         return ResponseEntity.ok(description);
     }
 
-    public final StandardResponse createFailureResponse(String _msg) {
-        return createFailureResponse("500", _msg);
-    }
-
-
-    public final StandardResponse createFailureResponse(String _statusCode, String _msg) {
-        StandardResponse stdResponse = new StandardResponse();
-        stdResponse.initFailure(_statusCode, _msg);
-        return stdResponse;
-    }
-
 
     public final StandardResponse createSuccessResponse(String _msg) {
         return createSuccessResponse("200", _msg);
